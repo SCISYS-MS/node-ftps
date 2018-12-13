@@ -78,7 +78,7 @@ FTP.prototype.escapeshell = function (cmd) {
   if (typeof cmd !== 'string') {
     return ''
   }
-  return cmd.replace(/([&"\s'$`\\;])/g, '\\$1')
+  return cmd.replace(/([&"\s'$`\\])/g, '\\$1')
 }
 
 FTP.prototype._escapeshell = function (cmd) {
@@ -136,15 +136,18 @@ FTP.prototype.exec = function (cmds, callback) {
       cwd: this.options.cwd
     }
   }
-
-  var lftp = spawn('lftp', ['-c', cmd], spawnoptions)
+ 
+console.log("LFTP Command: lftp -c " + "'" + cmd + "'")
+  var lftp = spawn(__dirname + '/lftp/lftp.exe', ['-c',  cmd ], spawnoptions)
   var data = ''
   var error = ''
 
   lftp.stdout.on('data', function (res) {
+ 
     data += res
   })
   lftp.stderr.on('data', function (res) {
+ 
     error += res
   })
   lftp.on('error', function (err) {
@@ -157,6 +160,7 @@ FTP.prototype.exec = function (cmds, callback) {
     callback = null // Make sure callback is only called once, whether 'exit' event is triggered or not.
   })
   lftp.on('close', function (code) {
+	
     if (callback) {
       callback(null, {
         error: error || null,
@@ -185,7 +189,7 @@ FTP.prototype.execAsStream = function (cmds) {
     }
   }
 
-  return dcp.spawn('lftp', ['-c', cmd], spawnoptions)
+  return dcp.spawn(__dirname + '/lftp/lftp.exe', ['-c', "'" + cmd + "'"], spawnoptions)
 }
 
 FTP.prototype.raw = function (cmd) {
